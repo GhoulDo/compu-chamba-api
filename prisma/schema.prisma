@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role Role @relation(fields: [RoleId], references: [id])
+  RoleId   String
+}
+
+model Company {
+  id       String @id @default(uuid())
+  name     String
+  nit      String
+  email    String @unique
+  password String
+  role     Role   @relation(fields: [RoleId], references: [id])
+  RoleId   String
+  Oferts   String
+}
+
+model Oferts {
+  id           String       @id @default(uuid())
+  title        String
+  description  String
+  salary       String
+  companyId    String
+  schedule_id  String
+  schedule     Schedule     @relation(fields: [schedule_id], references: [id])
+  modality_id  String
+  Modality     modality     @relation(fields: [modality_id], references: [id])
+  description_ String
+  requirements String
+  Requeriments Requirements @relation(fields: [requirements], references: [id])
+  category_id  String
+  category     Category     @relation(fields: [category_id], references: [id])
+  applicants   String
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  Description String
+  oferts      Oferts[]
+}
+
+model Role {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  Company     Company[]
+  users       User[]
+}
+
+model modality {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  Description String
+  oferts      Oferts[]
+}
+
+model Schedule {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  Description String
+  oferts      Oferts[]
+}
+
+model Requirements {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  Description String
+  oferts      Oferts[]
+}
+
