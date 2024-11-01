@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,76 +8,67 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  email    String @unique
-  gender  String?
-  password String
-  role Role @relation(fields: [RoleId], references: [id])
-  RoleId   String
+  id           String        @id @default(uuid())
+  registration_date DateTime @default(now())
+  name         String
+  lastname     String
+  email        String        @unique
+  password     String
+  RoleId       String
+  gender       String
+  applications Application[]
+  role         Role          @relation(fields: [RoleId], references: [id])
+
+  @@index([RoleId], map: "User_RoleId_fkey")
 }
 
 model Company {
-  id       String @id @default(uuid())
+  id       String   @id @default(uuid())
+  registration_date DateTime @default(now())
   name     String
   nit      String
-  email    String @unique
+  email    String   @unique
   password String
-  role     Role   @relation(fields: [RoleId], references: [id])
   RoleId   String
-  Oferts   String
+  oferts   Oferts[]
+  role     Role     @relation(fields: [RoleId], references: [id])
+
+  @@index([RoleId], map: "Company_RoleId_fkey")
+}
+
+model Application {
+  id      String @id @default(uuid())
+  userId  String
+  ofertId String
+  application_date DateTime @default(now())
+  user  User   @relation(fields: [userId], references: [id])
+  ofert Oferts @relation(fields: [ofertId], references: [id])
+
+  @@unique([userId, ofertId])
 }
 
 model Oferts {
-  id           String       @id @default(uuid())
-  title        String
-  description  String
-  salary       String
-  companyId    String
-  schedule_id  String
-  schedule     Schedule     @relation(fields: [schedule_id], references: [id])
-  modality_id  String
-  Modality     modality     @relation(fields: [modality_id], references: [id])
-  description_ String
-  requirements String
-  Requeriments Requirements @relation(fields: [requirements], references: [id])
-  category_id  String
-  category     Category     @relation(fields: [category_id], references: [id])
-  applicants   String
+  id             String        @id @default(uuid())
+  publication_date DateTime @default(now())
+  title          String
+  description    String
+  salary         String
+  companyId      String
+  typeOfcontract String
+  schedule       String
+  modality       String
+  applications   Application[]
+  requeriments String
+  experience String
+  company        Company       @relation(fields: [companyId], references: [id])
 }
 
-model Category {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  Description String
-  oferts      Oferts[]
-}
+
 
 model Role {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  Company     Company[]
-  users       User[]
-}
-
-model modality {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  Description String
-  oferts      Oferts[]
-}
-
-model Schedule {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  Description String
-  oferts      Oferts[]
-}
-
-model Requirements {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  Description String
-  oferts      Oferts[]
+  id      String    @id @default(uuid())
+  name    String    @unique
+  Company Company[]
+  users   User[]
 }
 
