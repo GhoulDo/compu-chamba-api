@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, HttpCode } from '@nestjs/common';
 import { OfertsService } from './oferts.service';
 import { CreateOfertDto } from './dto/create-ofert.dto';
 import { UpdateOfertDto } from './dto/update-ofert.dto';
@@ -8,27 +8,28 @@ export class OfertsController {
   constructor(private readonly ofertsService: OfertsService) {}
 
   @Post()
-  create(@Body() createOfertDto: CreateOfertDto) {
-    return this.ofertsService.create(createOfertDto);
+  async create(@Body() createOfertDto: CreateOfertDto) {
+    return await this.ofertsService.create(createOfertDto);
   }
 
   @Get()
-  findAll() {
-    return this.ofertsService.findAll();
+  async findAll() {
+    return await this.ofertsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ofertsService.findOne(+id);
+  async findOne(@Param('id',ParseUUIDPipe) id: string) {
+    return await this.ofertsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOfertDto: UpdateOfertDto) {
-    return this.ofertsService.update(+id, updateOfertDto);
+  async update(@Param('id',ParseUUIDPipe) id: string, @Body() updateOfertDto: UpdateOfertDto) {
+    return await this.ofertsService.update(id, updateOfertDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ofertsService.remove(+id);
+  @HttpCode(204)
+  async remove(@Param('id',ParseUUIDPipe) id: string) {
+    return this.ofertsService.remove(id);
   }
 }

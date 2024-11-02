@@ -9,27 +9,27 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return await this.userService.create(createUserDto);
   }
 
   @Get()
   async findAll() {
-    return this.userService.findAll();
+    return await this.userService.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id',ParseUUIDPipe) id: string) {
-    return this.userService.findOne(id);
+    return await this.userService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id',ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  async update(@Param('id',ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
+    return await this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   async remove(@Param('id',ParseUUIDPipe) id: string) {
-    return this.userService.remove(id);
+    return await this.userService.remove(id);
   }
 }
