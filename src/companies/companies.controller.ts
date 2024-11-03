@@ -2,7 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, HttpC
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { Auth } from 'src/common/decorators/auth.decorator';
+import { Role } from 'src/common/enums/role.enum';
 
+
+//@Auth(Role.ADMIN)
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) { }

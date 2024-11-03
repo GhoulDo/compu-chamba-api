@@ -2,7 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, HttpC
 import { ApplicationsService } from './applications.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
+import { Auth } from 'src/common/decorators/auth.decorator';
+import { Role } from 'src/common/enums/role.enum';
 
+
+@Auth(Role.USER||Role.ADMIN)
 @Controller('applications')
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}

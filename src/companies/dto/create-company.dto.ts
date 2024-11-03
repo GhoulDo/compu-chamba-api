@@ -17,7 +17,4 @@ export class CreateCompanyDto {
     @MinLength(8)
     password : string
 
-    @IsUUID()
-    @IsNotEmpty()
-    RoleId : string;
 }
