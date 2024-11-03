@@ -2,7 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, HttpC
 import { OfertsService } from './oferts.service';
 import { CreateOfertDto } from './dto/create-ofert.dto';
 import { UpdateOfertDto } from './dto/update-ofert.dto';
+import { Auth } from 'src/common/decorators/auth.decorator';
+import { Role } from 'src/common/enums/role.enum';
 
+
+@Auth(Role.COMPANY||Role.ADMIN)
 @Controller('oferts')
 export class OfertsController {
   constructor(private readonly ofertsService: OfertsService) {}

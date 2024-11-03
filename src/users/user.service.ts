@@ -4,11 +4,12 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/libs/prisma/prisma.service';
-import { error } from 'console';
+import { passHash } from 'src/common/utils/passHash';
 
 @Injectable()
 export class UserService {
@@ -19,8 +20,15 @@ export class UserService {
       return await this.prismaService.user.create({
         data: {
           ...createUserDto,
-          RoleId: '37920b5b-7c86-4f60-91e6-3089e07c72aa',
+          RoleId: process.env.ROLE_USER,
+          password: await passHash(createUserDto.password),
         },
+        select: {
+          email:true,
+          password:false,
+          name:true,
+          lastname:true
+        }
       });
     } catch (error) {
       if (error.code === 'P2003') {
@@ -37,7 +45,7 @@ export class UserService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-
+      console.log(error)
       throw new InternalServerErrorException('An unexpected error an ocurred');
     }
   }
@@ -96,4 +104,33 @@ export class UserService {
       throw new InternalServerErrorException('An unexpected error an ocurred');
     }
   }
+
+  async findByEmail(email: string) {
+    try {
+      const exists = await this.prismaService.user.findUnique({
+        where: { email },
+        select: {
+          email: true,
+          password: true,
+          RoleId: true,
+          name: true,
+          lastname: true,
+        },
+      });
+
+      if (!exists) {
+        throw new UnauthorizedException('Error email not Found');
+      }
+
+      return exists;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('An unexpected error ocurred');
+    }
+  }
+
+  
 }
