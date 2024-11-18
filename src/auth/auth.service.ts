@@ -21,17 +21,23 @@ export class AuthService {
   async login({ email, password }: LoginDto) {
     const user = await this.userService.findByEmail(email);
     const isPasswordValid = await compare(password, user.password);
+    const id = user.id;
 
     if (!isPasswordValid) throw new UnauthorizedException('Password Incorrect');
 
-    const payload = { email: user.email, RoleId: user.RoleId };
+    const payload = {
+      email: user.email,
+      RoleId: user.RoleId,
+      user,
+      id: user.id,
+    };
 
     const token = await this.jwtService.signAsync(payload);
-    return { email, token };
+    return { email, token, id };
   }
 
-  async registerCompanies(createUserDto: CreateCompanyDto) {
-    await this.companiesService.create(createUserDto);
+  async registerCompanies(createCompanyDto: CreateCompanyDto) {
+    return await this.companiesService.create(createCompanyDto);
   }
 
   async loginCompanies({ email, password }: LoginDto) {

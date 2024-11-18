@@ -1,4 +1,5 @@
-import { Response } from 'express';
+import * as AWS from 'aws-sdk';
+import { v4 as uuidv4 } from 'uuid';
 import {
   BadRequestException,
   Injectable,
@@ -13,7 +14,40 @@ import { passHash } from 'src/common/utils/passHash';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  private s3: AWS.S3;
+
+  constructor(private readonly prismaService: PrismaService) {
+    this.s3 = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION,
+    });
+  }
+
+  async uploadFile(file: Express.Multer.File, id: string): Promise<string> {
+    const fileKey = `${uuidv4()}-${file.originalname}`;
+
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: fileKey,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
+
+    try {
+      await this.s3.upload(params).promise();
+      const file = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+      await this.prismaService.user.update({
+        where: { id },
+        data: {
+          video: file,
+        },
+      });
+      return file;
+    } catch (error) {
+      throw new Error(`Failed to upload file: ${error.message}`);
+    }
+  }
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -24,11 +58,11 @@ export class UserService {
           password: await passHash(createUserDto.password),
         },
         select: {
-          email:true,
-          password:false,
-          name:true,
-          lastname:true
-        }
+          email: true,
+          password: false,
+          name: true,
+          lastname: true,
+        },
       });
     } catch (error) {
       if (error.code === 'P2003') {
@@ -45,7 +79,7 @@ export class UserService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      console.log(error)
+      console.log(error);
       throw new InternalServerErrorException('An unexpected error an ocurred');
     }
   }
@@ -110,6 +144,7 @@ export class UserService {
       const exists = await this.prismaService.user.findUnique({
         where: { email },
         select: {
+          id:true,
           email: true,
           password: true,
           RoleId: true,
@@ -131,6 +166,4 @@ export class UserService {
       throw new InternalServerErrorException('An unexpected error ocurred');
     }
   }
-
-  
 }

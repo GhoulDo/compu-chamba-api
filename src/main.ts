@@ -10,6 +10,7 @@ async function bootstrap() {
     forbidNonWhitelisted: true, // Lanza error si hay propiedades no declaradas
     transform: true, // Transforma la entrada según el tipo definido en el DTO
   }));
-  await app.listen(process.env.PORT ?? 3000);
+  app.enableCors({});	
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

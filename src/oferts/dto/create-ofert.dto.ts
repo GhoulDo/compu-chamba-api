@@ -30,6 +30,9 @@ export class CreateOfertDto {
     @IsString()
     @IsNotEmpty()
     typeOfcontract : string
+
+    @IsString()
+    location : string
     
     @IsString()
     @IsNotEmpty()
