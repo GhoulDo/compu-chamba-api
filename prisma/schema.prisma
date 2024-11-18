@@ -8,62 +8,67 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  registration_date DateTime @default(now())
-  name         String
-  lastname     String
-  email        String        @unique
-  password     String
-  RoleId       String
-  gender       String
-  applications Application[]
-  role         Role          @relation(fields: [RoleId], references: [id])
+  id                String        @id @default(uuid())
+  registration_date DateTime      @default(now())
+  name              String
+  lastname          String
+  email             String        @unique
+  password          String
+  RoleId            String
+  gender            String
+  description       String?
+  video             String?
+  experience        String?
+  applications      Application[]
+  role              Role          @relation(fields: [RoleId], references: [id])
 
   @@index([RoleId], map: "User_RoleId_fkey")
 }
 
 model Company {
-  id       String   @id @default(uuid())
+  id                String   @id @default(uuid())
   registration_date DateTime @default(now())
-  name     String
-  nit      String
-  email    String   @unique
-  password String
-  RoleId   String
-  oferts   Oferts[]
-  role     Role     @relation(fields: [RoleId], references: [id])
+  name              String
+  nit               String
+  email             String   @unique
+  password          String
+  RoleId            String
+  role              Role     @relation(fields: [RoleId], references: [id])
+  oferts            Oferts[]
 
   @@index([RoleId], map: "Company_RoleId_fkey")
 }
 
 model Application {
-  id      String @id @default(uuid())
-  userId  String
-  ofertId String
+  id               String   @id @default(uuid())
+  userId           String
+  ofertId          String
   application_date DateTime @default(now())
-  user  User   @relation(fields: [userId], references: [id])
-  ofert Oferts @relation(fields: [ofertId], references: [id])
+  ofert            Oferts   @relation(fields: [ofertId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, ofertId])
+  @@index([ofertId], map: "Application_ofertId_fkey")
 }
 
 model Oferts {
-  id             String        @id @default(uuid())
-  publication_date DateTime @default(now())
-  title          String
-  description    String
-  salary         String
-  companyId      String
-  typeOfcontract String
-  schedule       String
-  modality       String
-  applications   Application[]
-  requeriments String
-  experience String
-  company        Company       @relation(fields: [companyId], references: [id])
+  id               String        @id @default(uuid())
+  publication_date DateTime      @default(now())
+  title            String
+  description      String
+  salary           String
+  companyId        String
+  typeOfcontract   String
+  schedule         String
+  modality         String
+  location         String
+  requeriments     String
+  experience       String
+  applications     Application[]
+  company          Company       @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], map: "Oferts_companyId_fkey")
 }
-
-
 
 model Role {
   id      String    @id @default(uuid())
@@ -71,4 +76,3 @@ model Role {
   Company Company[]
   users   User[]
 }
-

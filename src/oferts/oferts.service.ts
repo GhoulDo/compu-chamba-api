@@ -20,13 +20,22 @@ export class OfertsService {
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException("An error occurred while creating the offer")
+      console.log(error)
+      throw new BadRequestException({
+        message: 'An error occurred while creating the offer',
+        error:error.meta
+      });
+      
     }
   }
 
   async findAll() {
     try {
-      return await this.prismaService.oferts.findMany();
+      return await this.prismaService.oferts.findMany({
+        include:{
+          _count:true
+        }
+      });
     } catch (error) {
       throw new InternalServerErrorException(
         'An error occurred while searching for the offer',
@@ -47,6 +56,27 @@ export class OfertsService {
       }
       throw new InternalServerErrorException(
         'An error occurred while fetching the offer',
+      );
+    }
+  }
+
+  async findByTitleAndLocation(title: string,location:string) {
+    try {
+      return await this.prismaService.oferts.findMany({
+        where: {
+          title: {
+            contains: title,
+          },
+          location:{
+            contains:location
+
+          }
+        },
+      });
+      
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'An error occurred while searching for offers by title',
       );
     }
   }
