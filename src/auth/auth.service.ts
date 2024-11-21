@@ -19,9 +19,11 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto) {
+    
     const user = await this.userService.findByEmail(email);
     const isPasswordValid = await compare(password, user.password);
     const id = user.id;
+    
 
     if (!isPasswordValid) throw new UnauthorizedException('Password Incorrect');
 
@@ -33,7 +35,7 @@ export class AuthService {
     };
 
     const token = await this.jwtService.signAsync(payload);
-    return { email, token, id };
+    return { email, token, id};
   }
 
   async registerCompanies(createCompanyDto: CreateCompanyDto) {

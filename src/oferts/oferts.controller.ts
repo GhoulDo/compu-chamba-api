@@ -16,6 +16,8 @@ import { UpdateOfertDto } from './dto/update-ofert.dto';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { Role } from 'src/common/enums/role.enum';
 
+
+//@Auth(Role.COMPANY)
 @Controller('oferts')
 export class OfertsController {
   constructor(private readonly ofertsService: OfertsService) {}
